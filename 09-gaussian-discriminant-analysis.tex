@@ -1,0 +1,338 @@
+\part{Gaussian Discriminant Analysis (GDA)}
+
+\subsection{Setup}
+
+\section{GDA}
+\begin{enumerate}
+    \item Multiple classes: $y \in \{1,2,\ldots,K\}$
+    \item GDA assumes that the conditional distribution of the features is
+(Normal) Gaussian within each class :
+
+\[
+x \mid y = k \sim \mathcal{N}(\mu_k, \Sigma_k),
+\qquad k = 1,\ldots,K.
+\]
+\item Parameters to learn: 
+\begin{itemize}
+    \item \textbf{Class priors}: $\phi_k = p(y = k)$
+    \item  \textbf{Class means}
+    $\mu_k$
+\item \textbf{Class covariance matrices}: $ \Sigma_k$
+\end{itemize}
+\end{enumerate}
+
+
+\begin{rem}
+    From Naive Bayes to GDA, we relax the independence assumption - allow features to be correlated.
+\end{rem}
+
+
+
+
+\subsection{Binary classification}
+
+\begin{note}
+    Instead of learning “how to separate classes,” we learn “what each class looks like.”
+\end{note}
+
+
+\begin{important}[GDA intuition]
+
+For binary classification with classes \(y \in \{0,1\}\):
+\begin{enumerate}
+
+
+\item \textbf{Learn the class priors:}
+\[
+p(y=0), \qquad p(y=1).
+\]
+
+\item \textbf{Learn the class-conditional feature distributions:}
+\[
+p(x \mid y=0) = \mathcal{N}(x \mid \mu_0, \Sigma_0), 
+\qquad
+p(x \mid y=1) = \mathcal{N}(x \mid \mu_1, \Sigma_1),
+\]
+where each class has
+\[
+\mu_0,\, \mu_1 \quad \text{(mean vectors)},
+\qquad
+\Sigma_0,\, \Sigma_1 \quad \text{(covariance matrices)}.
+\]
+
+\item \textbf{Predict the class with the higher posterior probability:}
+\[
+p(y=1 \mid x)
+=
+\frac{
+p(y=1)\, p(x \mid y=1)
+}{
+p(x)
+}.
+\]
+
+Equivalently, choose the class that maximizes the log-posterior:
+\[
+\log p(x \mid y) + \log p(y).
+\]
+
+\end{enumerate}
+
+\end{important}
+
+
+
+
+
+
+\section{Gaussian distribution}
+
+\begin{enumerate}
+    \item Start from 1D Gaussian (Normal distribution): 
+    \[
+\mathcal{N}(x \mid \mu, \sigma^2)
+= 
+\frac{1}{\sqrt{2\pi\sigma^{2}}}
+\exp\!\left(
+    -\,\frac{(x - \mu)^2}{2\sigma^{2}}
+\right).
+\]
+\item In 1 dimension: the normalization term =  \( 1 / \sqrt{2\pi\sigma^{2}} \).
+
+In \( d \) dimensions, \( (2\pi)^{d/2} \) generalizes \( 2\pi \), and \( |\Sigma|^{1/2} \) generalizes \( \sigma \).
+
+\[
+\mathcal{N}(x \mid \mu, \Sigma)
+=
+\frac{1}{(2\pi)^{d/2}\,|\Sigma|^{1/2}}
+\exp\!\left[
+    -\frac{1}{2}
+    (x - \mu)^{\mathsf T}
+    \Sigma^{-1}
+    (x - \mu)
+\right].
+\]
+
+\end{enumerate}
+
+
+
+\section{Classification rule}
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{6pt}
+\small
+\begin{tabular}{|c|p{5cm}|p{8cm}|}
+\hline
+\textbf{Step} & \textbf{Description} & \textbf{Common Formula} \\ \hline
+1 & Learn class priors & $P(c)$ using MLE \\ \hline
+2 & Learn class-conditional distributions & $P(\mathbf{x} \mid c)$ using MLE (univariate for NB, multivariate for GDA) \\ \hline
+3 & Predict the class & $c^* = \arg\max_c \; P(c)\, P(\mathbf{x} \mid c)$ \\ \hline
+\end{tabular}
+\end{table}
+
+
+\section{Distribution}
+
+GDA specifically assumes data follows Gaussian distribution. 
+\subsection{Univariate Gaussian}
+
+If $X$ is a single scalar, then X follows univariate Gaussian distribution: 
+\[
+X \sim \mathcal{N}(\mu, \sigma^2)
+\]
+
+\begin{itemize}
+    \item $X$: a single scalar
+    \item $\mu$: mean
+    \item $\sigma^2$: variance
+\end{itemize}
+
+\subsection{Multivarate Gaussian}
+
+
+
+
+
+\section{Naive Bayes and GDA comparisons}
+
+\subsection{Summary}
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{6pt}
+\small
+\begin{tabular}{|l|p{5cm}|p{5cm}|}
+\hline
+\textbf{Aspect} & \textbf{Naïve Bayes} & \textbf{GDA} \\ \hline
+Feature assumption & Independent given class & Correlated features allowed \\ \hline
+Feature type & Discrete or binary & Continuous \\ \hline
+$p(\mathbf{x} \mid c)$ & Product of 1D distributions & Multivariate Gaussian \\ \hline
+Covariance & Diagonal (off-diagonal entries are dropped due to non-covariance & Full covariance matrix \\ \hline
+\end{tabular}
+\end{table}
+
+
+\subsection{Parameters}
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{8pt}
+\small
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Level} & \textbf{Naïve Bayes} & \textbf{GDA} \\ 
+\hline
+\textbf{Per class} & 
+$2d$ (one mean + variance per feature) & 
+$d$ means $+$ $\dfrac{d(d+1)}{2}$ unique covariance parameters \\[6pt]
+
+\textbf{Total (for $K$ classes)} & 
+$K(2d) + (K - 1)$ & 
+$K\!\left[d + \dfrac{d(d+1)}{2}\right] + (K - 1)$ \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Gaussian Mixture Model (GMM)}
+
+\subsection{Generative process}
+
+\subsubsection*{Latent (hidden) cluster label}
+
+$z^{(i)}$ is a latent (hidden) cluster label for data point $x^{(i)}$. 
+
+
+\textbf{1) As a categorical random variable}
+
+\[
+z^{(i)} \sim \text{Categorical}(\pi_1, \ldots, \pi_K).
+\]
+
+It takes one of the values
+\[
+z^{(i)} \in \{1, 2, \ldots, K\}.
+\]
+
+
+\textbf{2) As a one-hot encoded vector}
+
+Sometimes written as below with a \(1\) in the position of the true cluster.
+\[
+z^{(i)} = (0,0,1,0,\ldots,0),
+\]
+
+
+
+\begin{itemize}
+    \item In clustering, we do \emph{not} observe the true cluster labels.
+    \item We assume each point was generated by some mixture component.
+    \item The goal of GMM/EM is to infer which component produced each point.
+\end{itemize}
+
+Thus, GMM computes the responsibility which estimates the probability that data point \(x^{(i)}\) belongs to cluster \(k\).
+
+\[
+r_k^{(i)} = p(z^{(i)} = k \mid x^{(i)}),
+\]
+
+
+
+
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|p{5cm}|p{5cm}|}
+\hline
+\textbf{Concept} & \textbf{GDA (Gaussian Discriminant Analysis)} & \textbf{GMM (Gaussian Mixture Model)} \\
+\hline
+
+\textbf{Learning type} 
+& Supervised 
+& Unsupervised \\
+\hline
+
+\textbf{Labels known?} 
+& Yes (\(y\) given) 
+& No (latent \(z\)) \\
+\hline
+
+\textbf{Goal} 
+& Predict class label 
+& Cluster data / density estimation \\
+\hline
+
+\textbf{Model assumption} 
+& Each class \(y=k\) generates \(x\) from a Gaussian 
+& Data is generated from a mixture of \(K\) Gaussians \\
+\hline
+
+\textbf{Generative process} 
+& 1. Sample \(y \sim \text{Categorical}(\pi)\) \newline
+  2. Sample \(x \sim \mathcal{N}(\mu_y, \Sigma_y)\)
+& 1. Sample \(z \sim \text{Categorical}(\pi)\) \newline
+  2. Sample \(x \sim \mathcal{N}(\mu_z, \Sigma_z)\) \\
+\hline
+
+\textbf{Density form} 
+& \(p(x,y) = \pi_y\, \mathcal{N}(x \mid \mu_y, \Sigma_y)\) 
+& \(p(x) = \sum_{k=1}^K \pi_k\, \mathcal{N}(x \mid \mu_k, \Sigma_k)\) \\
+\hline
+
+\textbf{Posterior} 
+& \(p(y=k \mid x)\) 
+& \(r_k(i) = p(z=k \mid x_i)\) (responsibility) \\
+\hline
+
+\textbf{Parameter learning} 
+& Closed-form MLE: means, covariances, priors 
+& EM algorithm (E-step + M-step) \\
+\hline
+
+\textbf{Assignment type} 
+& Hard (labels known) 
+& Soft probabilities \(r_k(i)\) \\
+\hline
+
+\textbf{Decision boundary} 
+& Linear if \(\Sigma_k\) shared; quadratic if \(\Sigma_k\) differ 
+& Not main goal; based on mixture likelihood \\
+\hline
+
+\textbf{Shapes allowed} 
+& Elliptical clusters from \(\Sigma_k\) 
+& Same; cluster shapes controlled by \(\Sigma_k\) \\
+\hline
+
+\textbf{When it works best} 
+& Classes are Gaussian-like and labeled 
+& Natural clusters, unlabeled, possibly overlapping \\
+\hline
+
+\textbf{Core challenge} 
+& None (labels provided) 
+& Missing labels \(\Rightarrow\) requires EM \\
+\hline
+
+\end{tabular}
+\end{table}
+
+
+\subsection{Summary of the Algorithm Flow}
+
+
+Initialize the parameters
+\[
+\pi_k,\;\mu_k,\;\Sigma_k.
+\]
+
+Then repeat:
+\begin{enumerate}
+    \item \textbf{E-step:} compute responsibilities \(r_k^{(i)}\).
+    \item \textbf{M-step:} update \(\pi_k,\;\mu_k,\;\Sigma_k\) using the new responsibilities.
+    \item \textbf{Check convergence:} stop when the log-likelihood stabilizes.
+\end{enumerate}
+
+This process continues until the parameters no longer change.

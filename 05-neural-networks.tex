@@ -1,0 +1,292 @@
+\part{Neural Network}
+
+\section{Multilayer perceptrons}
+
+\begin{problem}
+    Linear models cannot represent fucntions that are are not linearly separable. Therefore, we now use neural networks (multilayer perceptrons (MLPs)). 
+\end{problem}
+
+\begin{eq}[Multilayer perceptrons]
+    An MLP is a feedforward neural network made of layers of \textbf{simple units}:
+
+\[
+y = \phi\left(\sum_{j} w_j x_j + b\right)
+\]
+
+\begin{itemize}
+    \item $x_j$: inputs
+    \item $w_j$: weights
+    \item $b$: bias
+    \item $\phi$: non-linear activation function (eg. linear regressionk, sigmoid,...)
+    \item $a$: output/activation
+\end{itemize}
+\end{eq}
+
+
+
+\subsection{MLP as a Composition of Functions}
+
+An MLP processes data layer by layer. Each layer takes an input, transforms it, and passes it to the next layer.
+
+\begin{itemize}
+    \item A \textbf{neuron }q computing unit
+    \item A \textbf{layer} = a group of neurons operating at the same depth
+\end{itemize}
+
+\subsubsection{Indexed (per-neuron) form}
+
+\begin{itemize}
+    \item Inputs: $x_j$ (feature index $j = 1, \ldots, D)$
+    \item Hidden layer $\ell$ units: $h_i^{(\ell)}$ (unit index $i$)
+    \item Output units: $y_i$
+\end{itemize}
+
+
+\subsubsection{Vector (per example) form}
+\begin{itemize}
+    \item $x \in \mathbb{R}^D$ of $D$ features
+    \item Hidden layers: One unit in the $\ell$-th hidden layer: $h^{(\ell)}_i$ 
+    \item $y \in \mathbb{R}^K$ (e.g. $K$ classes)
+\end{itemize}
+
+\subsubsection{Computation in each layer}
+
+Each layer computes a function $\mathbf{f}$. The whole network computes a composite of functions: 
+
+\[
+y = f^{(L)} \circ \cdots \circ f^{(1)}(x)
+\]
+
+
+\begin{enumerate}
+    \item Fully connected = every unit in layer $\ell - 1$ connects to every unit in layer $\ell$.
+    \item Each unit has its own bias.
+\end{enumerate}
+
+
+\section{Activation functiond}
+
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|p{2.5cm}|X|X|X|X|}
+\hline
+\textbf{Feature} & \textbf{Hard Threshold} & \textbf{Logistic} & \textbf{Tanh} & \textbf{ReLU} \\
+\hline
+\textbf{Function} &
+$\phi(z) = \begin{cases} 1 & z \ge 0 \\ 0 & z < 0 \end{cases}$ &
+$\sigma(z) = \frac{1}{1 + e^{-z}}$ &
+$\tanh(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}}$ &
+$\text{ReLU}(z) = \max(0, z)$\\
+\hline
+\textbf{Output range} &
+$\{0,1\}$ &
+$(0,1)$ &
+$(-1,1)$ &
+$[0,\infty)$ \\
+\hline
+\textbf{Differentiable?} &
+No &
+Yes &
+Yes &
+Piecewise (not at $0$) \\
+\hline
+\textbf{Gradient} &
+$0$ almost everywhere (no learning) &
+$\sigma(z)(1-\sigma(z))$ (vanishes for large $|z|$) &
+$1-\tanh^2(z)$ (vanishes for large $|z|$) &
+{ $\begin{cases} 1 & z>0 \\ 0 & z<0 \\ \text{undefined} $z = 0$ \end{cases}$ } \\
+\hline
+\textbf{Nonlinearity strength} &
+Weak (binary) &
+Mild &
+Stronger than sigmoid &
+Strong \\
+\hline
+\textbf{Pros} &
+Simple, logical decisions &
+Smooth, probabilistic output &
+Zero-centered outputs &
+Fast, efficient, avoids vanishing gradient \\
+\hline
+\textbf{Cons} &
+Not trainable (no gradient) &
+Vanishing gradient, not zero-centered &
+Still vanishes at extremes &
+``Dying ReLU'' problem \\
+\hline
+\textbf{Output centered at 0?} &
+No &
+No &
+Yes &
+No \\
+\hline
+\textbf{Common use} &
+Perceptrons, logic gates &
+Binary classification output layer &
+Hidden layers (older networks) &
+Hidden layers (modern deep nets) \\
+\hline
+\end{tabularx}
+\caption{Comparison of activation functions in neural networks}
+\end{table}
+
+
+
+
+\subsection{ReLU}
+
+\begin{defn}
+    ReLU stands for Rectified Linear Unit. It is an activation function used in neural networks to introduce \textbf{nonlinearity}.
+\end{defn}
+
+\begin{itemize}
+    \item If input $x$ is positive, ReLu outputs the same value $x$
+    \item If input $x$ is 0 or negative, ReLu outputs 0
+\end{itemize}
+
+\begin{rem}
+Advanatages of ReLU: 
+\begin{enumerate}
+    \item  ReLU does not break Gradient descent. It cares about local slopes. One undefined point doesn’t affect. 
+
+    $$\frac{\partial L}{\partial w}
+= \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial z} \cdot \frac{\partial z}{\partial w}
+$$
+\item Nonlinear but close to linear: ReLU is nonlinear (good for learning complex functions), but for $z > 0$, it acts like a linear function. It helps GD follow smoother paths during learning. 
+\item No saturation - for $z > 0$, the output keeps growing and gradient stays 1. 
+\item Standard
+\item Simple to compute
+\end{enumerate}
+   
+\end{rem}
+
+
+\begin{rem}
+    Disadvanatges of ReLU: 
+    \begin{itemize}
+        \item Drying ReLU problem: some neuron never activate again
+        \item Unbounded output
+    \end{itemize}
+\end{rem}
+
+
+
+\subsection{Hard Threshold}
+
+
+\begin{rem}
+    Hard threshold is not suitable in gradient descent as: 
+    \begin{enumerate}
+    \item Undifferentiable: function has jump discontinuity at $z=0$. 
+    \item It has zero gradient, weights never update, then no learning. 
+    \end{enumerate}
+\end{rem}
+
+\subsection{Logistic}
+\subsection{Tanh}
+
+\section{Universality}
+
+\begin{thm}[Universal Approximation Theorem]
+    A neural network with at least one hidden layer and a nonlinear activation can learn to mimic any smooth pattern or relationship between inputs and outputs — as long as it has enough neurons.
+\end{thm}
+
+\begin{itemize}
+    \item Binary datasets → exact memorization (pattern matching)
+    \item Non-binary datasets → approximate arbitrary continuous functions.
+\end{itemize}
+
+\subsection{Pattern-matching for binary function}
+
+    \begin{itemize}
+        \item Worst-case hidden size is \(2^D\), which is exponential in the number of input features
+    \end{itemize}
+\
+\textbf{Setup}
+\begin{itemize}
+    \item Input (training example): $x \in \{0,1\}^D$
+    \item Target: $t \in \{0,1\}$
+    \item Let the set of positive training examples be \{ $x^{(1)}, x^{(2)}, \dots, x^{(K)}\} \text{ where } t = 1$.
+\end{itemize}
+\textbf{Hidden layer (pattern detectors):}
+    \begin{itemize}
+        \item For each positive example \(x^{(k)}\), create one hidden unit
+        \item Define weights for hidden unit \(k\) as:
+        \[
+        w_j^{(k)} =
+        \begin{cases}
+        +1 & \text{if } x_j^{(k)} = 1 \\
+        -1 & \text{if } x_j^{(k)} = 0
+        \end{cases}
+        \quad \text{for } j = 1, \dots, D
+        \]
+        \item Define bias:
+        \[
+        b^{(k)} = -(s^{(k)} - \tfrac{1}{2})
+        \] where \(s^{(k)} = \sum_{j=1}^D x_j^{(k)}\) (number of ones in \(x^{(k)}\))
+        \item Hidden unit activation:
+        \[
+        h_k(x) = \mathbf{1}\{(w^{(k)})^\top x + b^{(k)} \ge 0\}
+        \]
+        \item Equivalently:
+        \[
+        h_k(x) =
+        \begin{cases}
+        1 & \text{if } x = x^{(k)} \\
+        0 & \text{otherwise}
+        \end{cases}
+        \]
+    \end{itemize}
+\textbf{Output layer:}
+    \begin{itemize}
+        \item Combine hidden units using a hard-threshold OR
+        \[
+        y(x) = \mathbf{1}\left\{ \sum_{k=1}^K h_k(x) \ge 1 \right\}
+        \]
+        \item This means:
+        \[
+        y(x) = 1 \quad \text{iff} \quad x \text{ matches at least one positive example}
+        \]
+    \end{itemize}
+
+\section{Expressive Power}
+
+
+
+\begin{defn}
+    Expressive power = what kinds of functions a model is capable of learning.
+\end{defn}
+
+
+\begin{problem}
+    The key issue here is if a neural network only have linear activation functions, then it can represent linear functions only. Deep networks without nonlinear activation functions are no more powerful than one linear layer. Then Activation functions (e.g. nonlinearity ReLU/tanh/etc.) is ones which actually help a neural network to become much more expressive. 
+\end{problem}
+
+
+\section{Computing XOR with a Neural Network}
+
+\subsection{$x_1 \oplus x_2
+= (x_1 \land \lnot x_2) \;\lor\; (\lnot x_1 \land x_2)$}
+
+\[
+\begin{array}{|c|c|c|}
+\hline
+x & y & x \lor y \\
+\hline
+0 & 0 & 0 \\
+0 & 1 & 1 \\
+1 & 0 & 1 \\
+1 & 1 & 1 \\
+\hline
+\end{array}
+\]
+
+
+\begin{enumerate}
+    \item Step 1: OR detector: $x_1 + x_2 \geq 1$ (to get target 1). 
+    \item Step 2: AT hidden layer, the unit is computed as $h_{OR} = f([1,1]^T[x_1, x_2] -0.5)$. The threshold 0.5 separates sum 0 and 1.
+    
+\end{enumerate}
+
+\subsection{$x_1 \oplus x_2
+= (x_1 \lor x_2) \;\land\; \lnot(x_1 \land x_2)$}

@@ -1,0 +1,140 @@
+\part{K-Means Clustering}
+
+K-Means in an unsupervised learning algorithm to find patterns in unlabeled data by grouping similar points together.
+
+\section{What K-Means Wants to Find}
+
+Each cluster has a center (a centroid) and each point belongs to exactly one cluster.
+
+\begin{enumerate}
+    \item Assignments - which cluster each point belongs to
+    \item Centers — where each cluster center should be located
+\end{enumerate}
+
+\section{Clustering problem}
+
+
+\begin{itemize}
+    \item Data samples: for \(n = 1,\dots,N\), $x^{(n)} \in \mathbb{R}^D \quad \text{(observed)},$
+    
+    \item Cluster centers: for \(k = 1,\dots,K\), $m_k \in \mathbb{R}^D \quad \text{(not observed)},$
+    
+    \item Responsibilities (1-of-\(K\) encoding):
+    \[
+    r^{(n)} \in \mathbb{R}^K,\qquad 
+    r^{(n)}_k = 
+    \begin{cases}
+    1, & \text{if } x^{(n)} \text{ is assigned to cluster } k, \\
+    0, & \text{otherwise}.
+    \end{cases}
+    \]
+\end{itemize}
+
+\begin{eq}[K-Means Objective]
+
+\begin{enumerate}
+    \item  Form 1: Sum over all points: 
+    \[
+\min_{\{\mu_k\},\,\{c_i\}}
+\;\sum_{i=1}^{n} \left\lVert x_i - \mu_{\text{its cluster}} \right\rVert^{2},
+\]
+
+\begin{itemize}
+    \item Add up the squared distance from point $x_i$ to center of the cluster it is assigned to. 
+\end{itemize}
+\item Form 2: Group by clusters
+\[
+\min_{\{m_k\},\,\{r^{(n)}\}}
+\sum_{n=1}^{N} \sum_{k=1}^{K}
+r^{(n)}_k \, \bigl\| m_k - x^{(n)} \bigr\|^2.
+\]
+\begin{itemize}
+    \item Indicator function $r^{(n)}_k = \mathbf{1}\!\left[\, x^{(n)} \text{ is assigned to cluster } k \,\right]$,
+\item A vector: $r^{(n)} = [\,0,\dots,1,\dots,0\,]^{\top}$.
+\item We are minimizing the \textbf{total within-cluster variance.}
+\end{itemize}
+\end{enumerate}
+\end{eq}
+
+
+\section{Alternating Optimization}
+
+\begin{problem}
+    Finding the optimum directly is NP-hard.
+    \begin{itemize}
+        \item cluster assignments (discrete choices)
+        \item center positions (continuous variables)
+    \end{itemize}
+    Number of possible assignments = $K^N$, then impossibly to find global minima. And the objective function is non-convex.
+\end{problem}
+
+
+K-means Objectve: 
+$$\min_{\{m_k\},\,\{r^{(n)}\}}
+J(\{m_k\}, \{r^{(n)}\})$$
+Instead of directly solve the above problem, we alternate between 2 simpler subproblems: 
+
+\begin{enumerate}
+    \item Assignment step: Optimize $\min_{\{r^{(i)}\}}
+J(\{r^{(i)}\})$
+\item Center step: Optimize $\min_{\{m_k\}} J(\{m_k\})$
+\end{enumerate}
+
+\begin{eq}[Assignment step Derivation]
+    \begin{enumerate}
+        \item Given the centers, optimize each point’s assignment independently: 
+        \[
+r^{(n)} = \arg\min_{r^{(n)}} \sum_{k=1}^{K} r^{(n)}_k \, \lVert x^{(n)} - m_k \rVert^{2},
+\qquad r^{(n)} \in \{e_1,\dots,e_K\}.
+\]
+Pick the cluster whose center is closest to the point. 
+\item Assign each point to the closest cluster center.
+\[
+r^{(n)}_k = \mathbf{1}\!\left[\, x^{(n)} 
+\ \text{is assigned to cluster } k \,\right],
+\qquad
+\text{i.e.,}\quad
+r^{(n)} = [0,\dots,1,\dots,0]^{\top}.
+\]
+    \end{enumerate}
+\end{eq}
+
+
+\section{Soft K-Means}
+
+\begin{important}[Soft K-Means Algorithm]
+    \begin{enumerate}
+    \item Initialize \(K\) cluster centers 
+    \[
+        \mu_1,\; \mu_2,\; \ldots,\; \mu_K
+    \]
+    randomly.
+
+    \item Repeat until convergence (measured by change in the objective function):
+    \begin{enumerate}
+        \item \textbf{Update assignments:} For each data point \(i\), update
+        \[
+        r_k(i)
+        =
+        \frac{
+            \exp\!\bigl(-\beta \, \|x_i - \mu_k\|^2\bigr)
+        }{
+            \displaystyle 
+            \sum_{j} \exp\!\bigl(-\beta \, \|x_i - \mu_j\|^2\bigr)
+        }.
+        \]
+
+        \item \textbf{Update centers:} For each cluster \(k\), update
+        \[
+        \mu_k
+        =
+        \frac{
+            \displaystyle \sum_{i=1}^n r_k(i)\, x_i
+        }{
+            \displaystyle \sum_{i=1}^n r_k(i)
+        }.
+        \]
+    \end{enumerate}
+\end{enumerate}
+
+\end{important}

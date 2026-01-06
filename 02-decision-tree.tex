@@ -1,0 +1,162 @@
+\part{Decision Tree}
+
+Decision trees mimic human decision-making by splitting data based on features until a prediction can be made.
+
+\section{Structure}
+\begin{itemize}
+    \item Internal Nodes: Use some or all features of $X$ to split the dataset
+    \item Branches: Represent the outcomes of the test.
+    \begin{enumerate}
+        \item Compute entropy of $Y$ (=uncertainty)
+        \item Compute information gain (=how much the entropy is reduced). 
+    \end{enumerate}
+    \item Leaf Nodes: Output a prediction (class label or value). 
+    \begin{enumerate}
+        \item Set $Y$ includes possible class labels
+        \item An unknown data point $y \in Y$
+    \end{enumerate}
+\end{itemize}
+
+\section{Decision Boundary}
+
+A decision tree divides the feature space into axis-aligned regions. Each region corresponds to a leaf node’s prediction.
+
+\begin{itemize}
+    \item For 2D features $(x_1, x_2)$: the decision regions are rectangles
+    \item For higher-dimensional features: they are hyper-rectangles. 
+\end{itemize}
+
+
+\section{Types of Trees}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Task Type} & \textbf{Prediction at Leaf Node} \\
+\hline
+\textbf{Classification} & Most frequent class label \\
+\hline
+\textbf{Regression} & Mean value of target in that region \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Useful Tree}
+
+\begin{problem}
+    What makes one tree better than another? 
+\end{problem}
+
+\begin{itemize}
+    \item Finding the optimal decision tree is hard.
+    \item The optimal tree classifies all training examples correctly.
+        \item This can require one leaf per example and won’t generalize well.
+        \item They are universal function approximators.
+    \item Instead of finding the optimal tree, we aim to learn a useful tree.
+\end{itemize}
+
+\section{Best Split}
+The model choose a split which \textbf{maximizes the information gain} and \textbf{minimzes the conditional entropy}.
+
+$\text{Best Split} = \arg\max_{x_i} \, \text{IG}(Y \mid X = x_i)$
+
+$\text{Best Split} = \arg\min_{x_i} \, H(Y \mid X = x_i)$
+
+
+
+\subsection{Information gain}
+
+
+\begin{defn}
+The more entropy of target variables, the more information gained. 
+    \begin{itemize}
+        \item IG measure how much information gained about target Y by knowing X.
+        \item IG is the reduction of entropy. We want to maximize IG. 
+    \end{itemize}
+\end{defn}
+
+\begin{eq}[Information Gain]
+ Information Gain = Entropy(before) $-$ Expected Entropy(after)
+\[
+IG(Y, X) = H(Y) - H(Y \mid X)
+\]
+
+\begin{itemize}
+    \item \textbf{Uncertainty Before Split:} Entropy $H(Y)$ quantifies how mixed the labels are.
+    \[
+H(Y) = -\sum_{y} p(y) \log_2 p(y)
+\]
+    \item \textbf{Uncertainty After Split:} Expected conditional entropy $H(Y \mid X)$ is the weighted average of the entropy in each branch after splitting on feature $X$.
+    
+\begin{align*}
+H(Y \mid X) &= -\sum_x p(x) \sum p(y \mid x) \log_2 p(y \mid x) \\
+&= - \sum_{x} p(x) \, H(Y \mid X = x)
+\end{align*}
+    \item \textbf{Decision Rule:} Choose the feature/split with the highest information gain for each node in the tree.
+\end{itemize}
+
+\end{eq}
+
+
+
+
+
+
+
+
+\subsection{Entropy of Features}
+
+\begin{eq}[Entropy]
+
+For a distribution over classes, entropy is defined as:
+
+\[
+H(X) = -\sum_{x \in X} p(x) \log_2 p(x)
+\]
+
+\begin{itemize}
+\item $X = \{x_1, x_2, \ldots, x_n\}$ is the set of features used for slit decision.
+\item $H(X)$: how evenly the features are distributed 
+    \item \textbf{High entropy:} Distribution of $X$ (data's features) are fairly uniform, making a flat histogram, and the given data is less predictable 
+    \item \textbf{Low entropy:}  Distribution of $X$ (data's features) are skewed, some feature are concentrated, and the given data is more predictable 
+\end{itemize}
+
+Example: 
+\begin{itemize}
+    \item Entropy of $(0.5, 0.5)$: $H = 1$ (maximum uncertainty)
+    \item Entropy of $(0.99, 0.01)$: $H \approx 0.08$ (very low entropy, highly predictable)
+\end{itemize}
+\end{eq}
+
+\subsection{Comparisons of $H(X)$ and $H(Y)$}
+
+\begin{enumerate}
+    \item Conditional entropy: 
+    
+    Conditional Entropy \( H(Y \mid X) \):
+\[
+H(Y \mid X) = - \sum_{x} P(x) \sum_{y} P(y \mid x) \log_2 P(y \mid x)
+\]
+
+Conditional Entropy \( H(X \mid Y) \):
+\[
+H(X \mid Y) = - \sum_{y} P(y) \sum_{x} P(x \mid y) \log_2 P(x \mid y)
+\]
+
+Conditrional entropy is not symmetric. 
+\[
+H(Y \mid X) \neq H(X \mid Y)
+\]
+
+\item $IG(Y \mid X) = 0$ or $H(Y \mid X) = H(Y)$: Zero information gained - X is completely uninformative about Y. Once you know $X$, you can perfectly predict $Y$. 
+
+\item $IG(Y \mid X) = H(Y)$ or  $H(Y \mid X) = 0$: Zero conditional entropy - 
+X has no relationship with Y - knowing X does not tell you anything about the class label Y. 
+
+\item $H(Y) = 1$: Y is perfectly random (each class has equal probability). 
+\item $H(X=1)$ does not say anything. 
+\end{enumerate}
+
+
+

@@ -1,0 +1,390 @@
+\part{Bias Variance decomposition}
+
+\section{Generalization}
+
+\begin{defn}[Generalization]
+    How well a trained model predicts on new samples from the same distribution as the training data.
+\end{defn}
+
+\subsection{Measuring generalization}
+
+Data is split into: 
+\begin{itemize}
+    \item Training set: used to fit the model 
+    \item Validation set: used to tune hyperparameters
+    \item Test set used once at the end to measure generalization
+\end{itemize}
+How errors change: 
+\begin{itemize}
+    \item With more data
+    \item With more parameters
+\end{itemize}
+
+\begin{note}
+$$\text{Train} \rightarrow \text{Tune} \rightarrow \text{Test} \rightarrow \text{Balance Bias \& Variance} \rightarrow \text{Regularize} \rightarrow \text{Generalize}$$
+\end{note}
+
+\section{Bias-variance}
+
+\begin{defn}[Bias]
+How \textbf{wrong} is the average prediction compared to the expected target?
+    
+\end{defn}
+
+\begin{defn}[Variance]
+    How much \textbf{do the predictions vary} for different training sets?
+\end{defn}
+
+\begin{defn}[Bayes error]
+    Irreducible noise — no model can fix it.
+\end{defn}
+
+\section{Mathematical expression}
+
+\begin{enumerate}
+    \item Data generating process: $p_{\mathcal{D}}(\mathbf{x}, \mathbf{t})$ is the true underlying distribution that generates all data in the world.
+    \item Training data: Sample a dataset $\mathcal{D}$ from $p_{\mathcal{D}}$ which represents the population
+    \item Learning algorithm $\mathcal{A}$ takes the training data $\mathcal{D}$ and produces a function which is the model
+    $$f : \mathbf{x} \rightarrow \mathbf{y}$$
+    \begin{itemize}
+        \item $f$ is random: different training samples give slightly differnet fitted model
+    \end{itemize}
+    \item Testing: Draw a new test point $(x,t)$ from the same distribution, and the model makes a prediction $y=f(x)$
+    \item Loss function: compare prediction to the truth
+    $$\mathcal{L}(y,t) = (y-t)^2 = (f(x)-t)^2$$
+    
+    \item Expected loss is used as  $\mathcal{D}$ (training set) and $(\mathbf{x}, t)$ (test sample) are random:
+\[
+\mathbb{E}[(y - t)^2] = \mathbb{E}[(f(\mathbf{x}) - t)^2]
+\]
+This expectation is taken over:
+\begin{itemize}
+    \item the randomness of the training data $\mathcal{D}$,
+    \item the randomness of the test example $(\mathbf{x}, \mathbf{t})$.
+\end{itemize}
+\end{enumerate}
+
+\subsection{Example
+}
+
+In real world, a general relationship is the more you study, the higher your expected score.
+
+
+
+
+
+
+\section{Expected test error}
+
+The expected test error is:
+\[
+\mathbb{E}_{\mathbf{x},t,\mathcal{D}}\big[(f_{\mathcal{D}}(\mathbf{x}) - t)^2\big].
+\]
+
+\begin{itemize}
+\item $f_{\mathcal{D}(x)}$: model trained on one dataset
+    \item $\bar{f}(\mathbf{x}) = \mathbb{E}_{\mathcal{D}}[f_{\mathcal{D}}(\mathbf{x})]$ mean prediction across \textbf{all datasets} (expectation over all random $\mathcal{D}$)
+    \begin{itemize}
+        \item $\bar{f}(\mathbf{x}) = \frac{1}{n}(f_{\mathcal{D}_1}(\mathbf{x}) + f_{\mathcal{D}_2} + \ldots )$
+    \end{itemize}
+    
+    \item $f^*(\mathbf{x}) = \mathbb{E}_t[t \mid \mathbf{x}]$
+    \begin{itemize}
+        \item  $y^* = f^*(\mathbf{x})$: true expected target $t$ according to the true data-generating process $p(t|x)$
+        \item Target $t$ is a real observed value $t = f^*(\mathbf{x}) + \epsilon$ and $Var(t|x)$ is the Bayes noise 
+        
+    \end{itemize}
+\end{itemize}
+
+
+\subsection{Step 1: Subtract and add the average predictor}
+We subtract and add $\bar{f}(\mathbf{x})$ to separate two sources of error.
+\begin{align*}
+\mathbb{E}_{\mathbf{x},t,\mathcal{D}}[(f_{\mathcal{D}}(\mathbf{x}) - t)^2] 
+&= \mathbb{E}_{\mathbf{x},t,\mathcal{D}}[(f_{\mathcal{D}}(\mathbf{x}) - \bar{f}(\mathbf{x}) + \bar{f}(\mathbf{x}) - t)^2] \\
+&= \mathbb{E}_{\mathbf{x},t,\mathcal{D}}[(f_{\mathcal{D}}(\mathbf{x}) - \bar{f}(\mathbf{x}))^2] \\
+&\quad + 2\mathbb{E}_{\mathbf{x},t,\mathcal{D}}[(f_{\mathcal{D}}(\mathbf{x}) - \bar{f}(\mathbf{x}))(\bar{f}(\mathbf{x}) - t)] \\
+&\quad + \mathbb{E}_{\mathbf{x},t,\mathcal{D}}[(\bar{f}(\mathbf{x}) - t)^2] =\text{Variance} + \text{Bias}^2 + \text{Noise}.
+\end{align*}
+
+
+\subsection{Step 2: Further decompose  the expected test error by subtracing and adding $\bar{y}(\mathbf{x)}$}
+
+When we decompose expected test error: 
+$$\mathbb{E}_{\mathbf{x},t,\mathcal{D}}[(\bar{f}(\mathbf{x}) - t)^2] = \mathbb{E}_{\mathbf{x},t,\mathcal{D}}[(\bar{f}(\mathbf{x}) - \bar{y}(\mathbf{x}))^2] + \mathbb{E}_{\mathbf{x},t,\mathcal{D}}[(\bar{y}(\mathbf{x}) - t)^2]$$
+
+\begin{enumerate}
+    \item \textbf{Bias:} Systematic error = $\mathbb{E}_{\mathbf{x}}[(\bar{f}(\mathbf{x}) - f^*(\mathbf{x}))^2]$. A property of the learning algorithm. 
+
+    \item \textbf{Residual:} The inherent randomness in the data:
+$$\text{Residual} = \mathbb{E}_{\mathbf{x},t}[(f^*(\mathbf{x}) - t)^2]$$. Computed for a single model and a single data point. 
+\end{enumerate}
+
+\subsection{Geometric intuition}
+
+\begin{itemize}
+    \item Input space: where data live.
+    \item Weight space: where parameters live.
+    \item Output space: where model predictions live.
+\end{itemize}
+
+\section{Ensemble method}
+
+\begin{defn}[Ensemble method]
+    Combine the predictions of multiple models (can be different) to create a stronger and more reliable final predictor.
+\end{defn}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|p{2cm}|p{3.5cm}|p{3.5cm}|p{2.5cm}|p{3cm}|}
+\hline
+\textbf{Method} & \textbf{Model types} & \textbf{Data sampling} & \textbf{Combination} & \textbf{Typical name} \\
+\hline
+Bagging & Same (e.g., all decision trees) & Bootstrap samples & Average / majority vote & Random Forest (bagged trees) \\
+\hline
+Boosting & Same & Weighted samples (sequential) & Weighted sum & AdaBoost, XGBoost \\
+\hline
+Stacking & Different (e.g., tree + logistic + NN) & Same or different data splits & Learned meta-model & Stacked ensemble \\
+\hline
+\end{tabular}
+\end{table}
+
+Suppose you train $m$ models independently:
+\[
+y_i = f_{\mathcal{D}_i}(\mathbf{x}), \quad i = 1, 2, \dots, m.
+\]
+
+Average their predictions:
+\[
+\bar{y} = \frac{1}{m} \sum_{i=1}^m y_i.
+\]
+
+ How averaging affects bias, variance and bayes error? 
+
+\begin{enumerate}
+    \item Bayes error: unchanged
+    \item Bias: unchanged
+    \item Variance: decreased
+    \[
+\text{Var}[\bar{y}] = \text{Var}\left[\frac{1}{m} \sum_{i=1}^m y_i\right] = \frac{1}{m^2} \sum_{i=1}^m \text{Var}[y_i] = \frac{1}{m} \text{Var}[y_1].
+\]
+\end{enumerate}
+
+
+\subsection{Bagging}
+
+Bagging is one of the most famous ensemble techniques.
+
+\begin{enumerate}
+    \item Draw $m$ bootstrap samples (random samples with replacement) from your original training data.
+    \item Train a separate model $f_1, f_2, \ldots, f_m$ on each bootstrap sample.
+    \item Average their predictions:
+    \[
+    \bar{f}(\mathbf{x}) = \frac{1}{m}\sum_{i=1}^m f_i(\mathbf{x}).
+    \]
+\end{enumerate}
+
+\begin{note}[Bagging]
+    \textbf{Bagging = variance reduction through resampling and averaging.}
+
+\end{note}
+
+\subsection{Bootstrap Aggregating}
+
+\begin{defn}
+    BAgging is a machine learning ensemble method that improves model stability and accuracy by training many versions of the same model on random variations of the training data and averaging their predictions.
+\end{defn}
+
+ Train $m$ models on bootstrap samples. For classification, aggregate predictions by
+\[
+y_{\text{bagged}} = \mathbb{I}\left(\frac{1}{m}\sum_{i=1}^{m} y_i > 0.5\right)
+\]
+where 
+
+\begin{itemize}
+    \item $y_i \in [0,1]$ (probability)
+    \item $y_i \in \{0,1\}$ (binary).
+
+\end{itemize} 
+
+Average outputs, then threshold.
+
+
+\subsection{The power of Bagging}
+
+Reduce variance (instability across datasets). For independent models:
+\[
+\mathrm{Var}\left(\frac{1}{m}\sum_{i=1}^m f_i\right) = \frac{1}{m}\mathrm{Var}[f]
+\]
+
+\begin{itemize}
+    \item Variance shrinks by $1/m$. In practice, correlation reduces this benefit.
+
+\end{itemize}
+
+
+\begin{problem}
+    If all models see nearly the same training data (high correlation), bagging doesn’t help much — their errors move together. Then we \textbf{add randomness in training to reduce correlation between models.}
+\end{problem}
+
+\section{Maximum Likelihood estimation}
+
+\subsection{Likelihood function}
+
+Goal: We flip the coin $N$ times, observe data $x_1, x_2, \ldots, x_N \in \{0,1\}$, and we want to estimate $\theta$, the true probability of heads.
+
+\begin{eq}[Likelihood function]
+The likelihood function is:
+\[
+L(\theta) = P(\text{data} \mid \theta) = \prod_{i=1}^N \theta^{x_i}(1-\theta)^{1-x_i} = \prod_{i=1}^N \theta^{N_1}(1-\theta)^{N_0 = N - N_1}
+\]
+\end{eq}
+
+\subsection{Log (Log-likelihood)}
+
+\begin{eq}[Log-Likelihood]
+    \[
+\ell(\theta) = \log L(\theta) = N_1 \log \theta + N_0 \log (1 - \theta),
+\]
+\end{eq}
+
+\begin{note}
+    Maximum Likelihood Estimation (MLE) finds the parameter value $\theta$ that maximizes
+\[
+P(\text{data} \mid \theta).
+\]
+\end{note}
+
+
+\subsubsection{Maximise the Log-Likelihood}
+
+\[
+\frac{d\ell}{d\theta} = \frac{N_1}{\theta} - \frac{N_0}{1 - \theta} = 0
+\]
+
+Solve for $\theta$:
+\begin{align*}
+N_1(1 - \theta) &= N_0 \theta \\
+N_1 &= \theta (N_0 + N_1) = \theta N
+\end{align*}
+
+\[
+\boxed{\hat{\theta}_{\text{MLE}} = \frac{N_1}{N}}
+\]
+
+\begin{note}
+    Graphically, $L(\theta)$ looks like a bell-shaped curve over $\theta \in [0, 1]$. 
+\end{note}
+
+\subsection{Where LME can fail}
+
+
+\begin{enumerate}
+    \item \textbf{Small data / extreme outcomes:} MLE can give extreme estimates (0 or 1). 
+    
+    \item \textbf{No prior information:} It ignores uncertainty about $\theta$.
+\end{enumerate}
+
+\section{Maximum A Posteriori Estimation (MAP)}
+
+Maximum a posteriori (MAP) estimation combines:
+\begin{itemize}
+    \item Likelihood $P(\text{data} \mid \theta)$ (what data say about the parameter)
+    \item Prior $P(\theta)$ (belief about $\theta$ before data)
+    \item Posterior $P(\theta | \text{data})$ your updated belief after combining the two
+\end{itemize}
+
+\subsection{Posterior maximization}
+MAP chooses $\theta$ that maximizes the posterior:
+\[
+\boxed{\hat{\theta}_{\text{MAP}} = \arg\max_\theta P(\theta \mid \text{data})}
+\]
+
+
+\begin{rem}
+    Instead of directly model $P(\text{data} \mid \theta)$ (since it's almost impossible in high-dimensional data), it models how data are generated for each class. 
+\end{rem}
+
+Using Bayes' rule:
+\[
+P(\theta \mid \text{data}) \propto P(\text{data} \mid \theta) \times P(\theta)
+\]
+
+Then we have: 
+\[
+\hat{\theta}_{\text{MAP}} = \arg\max_\theta \Big[ P(\text{data} \mid \theta) \, P(\theta) \Big]
+\]
+
+
+
+\subsection{Combine Likelihood and Prior}
+
+\begin{enumerate}
+    \item \textbf{Likelihood:}
+\[
+P(\text{data} \mid \theta)
+= \theta^{N_1}(1 - \theta)^{N_0}.
+\]
+\item \textbf{Combine with prior:}
+\[
+P(\text{data} \mid \theta)\, P(\theta)
+\propto
+\theta^{\,N_1 + a - 1}\,(1 - \theta)^{\,N_0 + b - 1}.
+\]
+\item \textbf{Posterior distribution:}
+\[
+\theta \mid \text{data}
+\sim
+\text{Beta}(a + N_1,\; b + N_0).
+\]
+\item \textbf{MAP estimate (mode of Beta$(a', b')$):}
+\[
+\hat{\theta}_{MAP}
+=
+\frac{a' - 1}{a' + b' - 2}.
+\]
+\item \textbf{Plug in updated parameters:}
+\[
+a' = a + N_1, 
+\qquad
+b' = b + N_0.
+\]
+\item \textbf{Final MAP estimate:}
+\[
+\hat{\theta}_{MAP}
+=
+\frac{a + N_1 - 1}{a + b + N - 2},
+\qquad
+\text{where } N = N_1 + N_0.
+\]
+
+\end{enumerate}
+
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Concept} & \textbf{Trusts What?} & \textbf{Behavior} \\ \hline
+\textbf{MLE} & Data only & Can overfit when data are few \\ \hline
+\textbf{MAP} & Data + Prior & Regularized, more stable \\ \hline
+\textbf{Bayesian posterior} & Whole distribution & Full uncertainty estimate \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Beta distribution}
+
+Choosing a Prior — The Beta Distribution. For $\theta \in [0, 1]$, use the Beta distribution:
+\[
+P(\theta; a, b)
+=
+\frac{\Gamma(a + b)}{\Gamma(a)\,\Gamma(b)}\,
+\theta^{\,a - 1}\,(1 - \theta)^{\,b - 1},
+\qquad 0 \leq \theta \leq 1,
+\]
+where 
+\begin{itemize}
+  \item $a > 0$ — strength of belief in heads.
+  \item $b > 0$ — strength of belief in tails.
+\end{itemize}
+Before seeing data, you act as if you had seen $a-1$ heads and $b-1$ tails.

@@ -1,0 +1,80 @@
+\part{Softmax Regression}
+
+\section{Softmax regression}
+
+
+\subsection{Binary classification}
+
+There are 2 classes for classification. 
+\begin{itemize}
+    \item 
+    The linear score (logit) for class 1 is $z = w^Tx$ 
+    \item Sigmoid function to turn the score into a probability: $y = \sigma(z) = \frac{1}{1 + e^{-z}}$ (based on logistic growth model)
+\end{itemize}
+
+
+\subsection{K classes classification}
+
+There are now $K>2$ classes, each class now needs its weight vector: 
+    \[
+W =
+\begin{bmatrix}
+w_1^\top \\
+w_2^\top \\
+\vdots \\
+w_K^\top
+\end{bmatrix} \in \mathbb{R}^{K \times d}
+\]
+\begin{itemize}
+    \item Each weight vector $w_{1,2,...,K}$ has same length with input vector $\mathbf{x}$. 
+    \item Softmax regression model now becomes: $\mathbf{z} = \mathbf{W}x$
+\end{itemize}
+
+
+
+\section{Softmax Activation function}
+\begin{eq}[Softmax function]
+This is a process of converting each raw model output (logit) in vector $\mathbf{z} = (z_1, z_2, \ldots, z_k)$ into predicting probability: 
+    $$
+y_k = \frac{e^{z_k}}{e^{z_1} + e^{z_2} + \cdots + e^{z_K}} = \frac{e^{z_k}}{\sum_{j=1}^K e^{z_j}}
+$$
+
+\begin{enumerate}
+    \item Exponential each logit $e^{z_i}$ to amplifies the differneces between logits 
+    \item Normalization is to scaling the logits so that they are interpreted as probabilities and sum up to 1
+\end{enumerate}
+\end{eq}
+
+\subsection{Gradient of Activation function}
+Softmax couples outputs together: changing one logit affects all class probabilities. If one class becomes more likely, others must become less likely.
+
+    \begin{itemize}
+        \item $\frac{\partial y_i}{\partial z_i} = y_i(1 - y_i)$: Increasing the score of class $i$ increases its probability, limited by $(1 - y_i)$. 
+        \item $\frac{\partial y_i}{\partial z_j} = -y_i y_z$: increasing the score of another class $j$ decreases the probability of class $i$.
+    \end{itemize}
+
+
+
+
+\section{Cross-entropy Loss}
+
+\begin{itemize}
+    \item Entropy: measure uncertainty.
+    \item Cross: how one probability distribution diverges from the second (expected probability distribution).
+\end{itemize}
+
+\begin{rem}
+    We add one-hot 
+\end{rem}
+
+\begin{eq}[Error signal]
+\begin{enumerate}
+    \item Sigmoid + Binary Cross Entropy: 
+$$\frac{\partial \mathcal{L}}{\partial z} = y - t \quad \text{(a scalar)}$$ 
+    
+    \item Softmax + Cross-entropy Loss
+\end{enumerate}
+    
+\end{eq}
+
+

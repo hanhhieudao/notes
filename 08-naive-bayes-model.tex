@@ -1,0 +1,85 @@
+\part{Naive Bayes Model}
+
+\section{Generative model}
+
+\begin{defn}
+    Learns how each class produces its data.
+\end{defn}
+
+\section{Discriminative model}
+
+\begin{defn}
+    Learns the decision boundary directly between classes.
+\end{defn}
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.2} % slightly more vertical space
+\setlength{\tabcolsep}{5pt} % reduce column padding
+\small % make text slightly smaller
+\begin{tabular}{|l|p{3cm}|p{3.5cm}|p{3.2cm}|p{4cm}|}
+\hline
+\textbf{Type} & \textbf{What it Learns} & \textbf{Thinks Like} & \textbf{Examples} & \textbf{Key Question} \\ \hline
+\textbf{Discriminative} &
+$p(t \mid \mathbf{x})$ &
+“How do I separate classes?” &
+Logistic Regression, Decision Trees &
+How likely is label $t$ given features $\mathbf{x}$? \\ \hline
+\textbf{Generative} &
+$p(\mathbf{x}, t) = p(\mathbf{x} \mid t)\,p(t)$ &
+“How is data \emph{generated} by each class?” &
+Naïve Bayes, Gaussian Bayes &
+How likely are features $\mathbf{x}$ for each possible label $t$? \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Naive Bayes}
+
+\begin{defn}
+    Naive Bayes is a probabilistic generative model.
+    It models how each class generates data $(p(\mathbf{x} \mid c)$ and $p(c)$:
+    \[
+p(x, c)
+=
+p(c)\,
+\prod_{j=1}^{d} p(x_j \mid c)
+\]
+
+$p(x,c)$ = the probability that an example both belongs to class \(c\)
+and has features \(\mathbf{x} = (x_1, x_2, \ldots, x_d).\)
+\end{defn}
+
+\begin{tcolorbox}[colback=gray!5!white,colframe=black!70!white,title=\textbf{Bayesian (Binary) Classification}]
+Feature vector: $\mathbf{x} = (x_1, \ldots, x_d)$, \quad Class label: $c \in \{0, 1\}$
+
+\begin{enumerate}
+  \item \textbf{Learn the probability of features given each class:}
+  \[
+  p(\mathbf{x} \mid c = 1), \qquad p(\mathbf{x} \mid c = 0)
+  \]
+
+  \item \textbf{Learn the prior probability of each class:}
+  \[
+  p(c = 0), \qquad p(c = 1)
+  \]
+
+  \item \textbf{Perform prediction using Bayes’ theorem:} Pick class $c$ such that $c^* = \arg\max_c \; P(c)\, P(\mathbf{x} \mid c)$. Compare class $c=1$ and $c=2$: 
+  \[
+  p(c = 1 \mid \mathbf{x})
+  = \alpha \, p(\mathbf{x} \mid c = 1) \, p(c = 1),
+  \qquad
+  p(c = 0 \mid \mathbf{x})
+  = \alpha \, p(\mathbf{x} \mid c = 0) \, p(c = 0),
+  \]
+  where $\alpha = \frac{1}{p(\mathbf{x)}}$ is a normalization constant ensuring probabilities sum to 1.
+    
+  
+\end{enumerate}
+\end{tcolorbox}
+
+
+\section{Parameters}
+
+\begin{rem}
+    In Naive Bayes, each individual probability is treated as a sepatrate model parameter that must be estimated from data. 
+\end{rem}

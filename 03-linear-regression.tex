@@ -1,0 +1,154 @@
+\part{Linear Regression}
+\section{Model}
+
+\begin{defn}
+    A model is the mathematical framework we use to approximate the unknown function $f$.
+\end{defn}
+
+\subsection{Goal}
+
+Learn a function (mapping):
+\[
+f : \mathbb{R}^D \rightarrow \mathbb{R}
+\]
+that predicts a scalar target \( t^{(i)} \) from input features \( x^{(i)} \in \mathbb{R}^D \).
+
+\begin{itemize}
+    \item A model approximates $f$  by making assumptions = restrictions.
+\item Those restrictions define the hypothesis space = what functions the model can and cannot represent.
+\end{itemize}
+
+\section{Linear model}
+
+Linear regression model assumes a linear relationship between input and output:
+
+\[
+y^{(i)} = \mathbf{w}^T \mathbf{x}^{(i)} + b
+\]
+
+\begin{itemize}
+    \item Incorporate the bias \( b \) into the weight vector \( \mathbf{w} \)
+    \item Add a constant 1 as the first feature in each input vector \( \mathbf{x}^{(i)} \)
+\end{itemize}
+
+Now the model becomes:
+
+\[
+y^{(i)} = \mathbf{w}^T \mathbf{x}^{(i)}
+\]
+
+\section{Predictions}
+
+\begin{eq}
+All equations are written in vector form. 
+
+Prediction for the $i$-th training point: 
+
+$$y^{(i)} = \mathbf{w}^\top \mathbf{x}^{(i)}$$
+
+Predictions for all training points: 
+$$\mathbf{y} = X \mathbf{w}
+$$
+
+Shapes: 
+$$\underbrace{\mathbf{y}}_{N \times 1} \;=\; 
+\underbrace{X}_{N \times (D+1)} \;
+\underbrace{\mathbf{w}}_{(D+1) \times 1}$$
+
+\begin{itemize}
+    \item Matrix $X$: 
+    \[
+X =
+\begin{bmatrix}
+\rowcolor{red!20} 1 & x^{(1)}_1 & x^{(1)}_2 & \cdots & x^{(1)}_D \\
+\rowcolor{blue!20} 1 & x^{(2)}_1 & x^{(2)}_2 & \cdots & x^{(2)}_D \\
+\rowcolor{green!20} 1 & x^{(3)}_1 & x^{(3)}_2 & \cdots & x^{(3)}_D \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+\rowcolor{yellow!20} 1 & x^{(N)}_1 & x^{(N)}_2 & \cdots & x^{(N)}_D
+\end{bmatrix}
+\]
+
+\begin{enumerate}
+    \item Each row = one observation ($i=1, \ldots, N$)
+    \item Each column after the first = one feature 
+    \item The 1st column corresponds to the bias term
+\end{enumerate}
+\item Weight vector $w$: 
+\[
+\mathbf{w} =
+\begin{bmatrix}
+b \\
+w_{1} \\
+w_{2} \\
+\vdots \\
+w_{D}
+\end{bmatrix}
+\]
+
+\end{itemize}
+
+\end{eq}
+
+
+\section{Cost of the Model}
+
+
+\begin{eq}[Loss function]
+\[
+L(\mathbf{y}^{(i)}, t^{(i)}) = \frac{1}{2} \big(y^{(i)} - t^{(i)}\big)^2 = \frac{1}{2} \big(\mathbf{w} \cdot \mathbf{x}^{(i)} - t^{(i)}\big)^2
+\]
+\begin{itemize}
+    \item $\big(y^{(i)} - t^{(i)}\big)^2$ is the squared error - how far off the prediction is from the true value
+    \item Factor $\frac{1}{2}$ is just for convenience when taking derivatives. 
+\end{itemize}
+    
+\end{eq}
+
+\begin{eq}[Mean Square Error (Cost function) and Gradient of Cost function]
+
+Mean square error: 
+    \[
+\mathcal{E}(\mathbf{w}) = \frac{1}{N} \sum_{i=1}^N \frac{1}{2} \big(\mathbf{w} \cdot \mathbf{x}^{(i)} - t^{(i)}\big)^2
+\]
+This is the average of the loss function over all 
+$N$ data points. It tells us how well the model performs overall, not just on one point.
+
+Gradient of Cost function:
+
+\begin{enumerate}
+    \item Non-vectorized form (loop over samples): 
+    \[
+\nabla_{\mathbf{w}} \mathcal{E}(\mathbf{w}) = \frac{1}{N} \sum_{n=1}^{N} \left( \mathbf{w}^T \mathbf{x}_n - t_n \right) \mathbf{x}_n
+\]
+\item Fully vectorized form: 
+\[
+\nabla_{\mathbf{w}} \mathcal{E}(\mathbf{w}) = \frac{1}{N} \mathbf{X}^T (\mathbf{X} \mathbf{w} - \mathbf{t})
+\]
+\end{enumerate}
+
+\end{eq}
+
+
+\section{Solution}
+
+\begin{defn}[Gradient Descent]
+    An iterative method to find the minima of a function.
+\end{defn}
+
+\begin{rem}
+    A solution of the linear regression model is the \textbf{optimized weights $w$} that minimizes the MSE. 
+\end{rem}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Feature} & \textbf{Direct Solution} & \textbf{Gradient Descent (Indirect solution)} \\ \hline
+Formula & $w = (X^T X)^{-1} X^T t$ & $w_{k+1} = w_k - \eta \nabla_w E$ \\ \hline
+Accuracy & Exact & Approximate (depends on convergence) \\ \hline
+Computation & Expensive for large $D$ & Can scale to very large $D$ \\ \hline
+Generality & Only works for linear regression with MSE & Works for almost any differentiable loss \\ \hline
+Iterations & None & Yes, iterative \\ \hline
+\end{tabular}
+\end{table}
+

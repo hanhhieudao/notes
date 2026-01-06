@@ -1,0 +1,159 @@
+\part{Linear Model}
+\section{Linear classifier}
+
+\begin{defn}[Linear classifier]
+    A linear classifier is a function of $w$ and $b$: 
+$$
+h(w,b) = \mathbf{w}^\top \mathbf{x} = \mathbf{b}
+$$
+
+\begin{itemize}
+    \item Parameters learned: number os entries in $W$ and $b$
+    \item Decision rule: determine if the raw score is below/above a threshold
+\end{itemize}
+\end{defn}
+
+
+\section{Binary Linear Classification}
+\begin{problem}
+    Predict categorical target $t \in \{0,1\}$ instead of continuous target.
+\end{problem}
+
+\begin{eq}[Linear Model for Binary Classification]
+\textbf{Linear model}
+\[
+z = \mathbf{w}^\top \mathbf{x}
+\]
+
+\textbf{Generate a prediction:}
+\[
+y =
+\begin{cases}
+1, & \text{if } z \ge 0 \\
+0, & \text{if } z < 0
+\end{cases}
+\]
+
+The decision boundary for this model is the hyperplane
+\[
+\mathbf{w}^\top \mathbf{x} = 0
+\]
+
+\end{eq}
+
+\subsection{Binary classifier}
+
+A binary classifier: 
+\begin{itemize}
+    \item Input: feature vector $\mathbf{x}$
+    \item Prediction: $y \in \{0,1\}$
+    \item True label: $t \in \{0,1\}$
+\end{itemize}
+
+
+
+\subsubsection{The 0-1 Loss Function}
+\begin{eq}[0-1 Loss Function for Binary Classifier]
+    \[
+L(y,t) =
+\begin{cases}
+0, & \text{if } y = t, \\
+1, & \text{if } y \neq t.
+\end{cases}
+= I[\text{condition}] =
+\begin{cases}
+1, & \text{if the condition is true}, \\
+0, & \text{if the condition is false}.
+\end{cases}
+\]
+\begin{itemize}
+    \item If the prediction matches the true label $\rightarrow$ loss $= 0$ (perfect).
+\item If the prediction is wrong $\rightarrow$ loss $= 1$ (bad).
+
+\end{itemize}
+
+\end{eq}
+
+\section{Geometric view}
+
+We focus on 2-dimensional input and weight spaces. 
+
+\subsection{Data (input) space}
+
+\begin{defn}
+    An input vector $\mathbf{x}$ us a point in data space.  Each training example is labeled either: 
+    \begin{itemize}
+        \item Positive (+)
+        \item Negative (-)
+    \end{itemize}
+\end{defn}
+
+\subsubsection{Region}
+
+A linear model uses weights and bias to form a decision rule using expression $\mathbf{z} = \mathbf{W}x + b$
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Region} & \textbf{Condition} & \textbf{Meaning} \\ \hline
+Positive region & $ \mathbf{w}^\top \mathbf{x} + b \ge 0 $ & Model predicts $+$ \\ \hline
+Negative region & $ \mathbf{w}^\top \mathbf{x} + b < 0 $ & Model predicts $-$ \\ \hline
+\end{tabular}
+\end{table}
+
+
+\subsubsection{Decision boundary}
+
+The boundary between positive and negative regions is:
+
+$$\mathbf{z} = \mathbf{W}x + b = 0$$
+
+\begin{itemize}
+    \item In 2D: a line
+    \item In 3D: a plane
+    \item In higher dimensions, it's called a hyperplane
+\end{itemize}
+
+
+\subsubsection{Linearly Separable Data}
+
+A dataset is linearly separable if there exists a weight vector $w$ and bias $b$ such that: 
+\begin{itemize}
+    \item all positive points are on one side
+    \item all negative points are on the other side
+\end{itemize}
+
+No mistake, this is perfect separation. 
+
+
+\section{Logic function}
+
+\subsection{AND}
+\subsection{OR}
+\subsection{NOT}
+
+\subsection{XOR - Exclusive OR}
+
+\begin{itemize}
+    \item If inputs are equal: output = 0
+    \item If inputs differ: output = 1
+\end{itemize}
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+$x_1$ & $x_2$ & $x_1 \oplus x_2$ (XOR) \\ \hline
+0 & 0 & 0 \\ \hline
+0 & 1 & 1 \\ \hline
+1 & 0 & 1 \\ \hline
+1 & 1 & 0 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{rem}
+    XOR is NOT linearly separable. 
+\end{rem}
+
+
+

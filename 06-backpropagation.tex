@@ -1,0 +1,458 @@
+\part{Propagation}
+
+\begin{enumerate}
+    \item Forward propagation: how a neural network makes a prediction.
+    \item Back propagation: how a neural network learns.
+
+\end{enumerate}
+
+
+\section{Forward propagation}
+
+\section{Back Propagation}
+
+\begin{important}[Backward Pass]
+
+A neural network learns from mistakes by updating weights using gradients. 
+
+$$\mathbf{W} \leftarrow \mathbf{W} - \eta \frac{\partial L}{\partial \mathbf{W}} $$
+
+$$
+b \leftarrow b - \eta \frac{\partial L}{\partial b}$$
+
+\end{important}
+
+
+\subsection{Setup}
+    
+A simple feedforward neural network with:
+    \begin{enumerate}
+    \item Input: $\mathbf{x} = (x_1 x_2 \ldots x_D)$
+        \item Weights: $\mathbf{W}^{(\ell)}$
+        \item Biases: $\mathbf{b}^{(\ell)}$
+    \end{enumerate}
+Hidden layer computation
+
+\begin{enumerate}
+    \item Pre-activation for neuron $j$ in layer $\ell$: $z_j^{(\ell)} = \sum_i w_{ij}^{(\ell)} a_i^{(\ell - 1)} + b_j^{(\ell)}$
+    \item Output activation: $a_j^{(\ell)} = f\left(z_j^{(\ell)}\right)$
+\end{enumerate}
+Output layer
+
+\[
+\hat{y}_k = a_k^{(2)} = f\left(z_k^{(2)}\right)
+\]
+Loss function 
+\[
+L = \frac{1}{2} \sum_k \left( y_k - \hat{y}_k \right)^2
+\]
+
+
+
+
+\begin{rem}
+    Each entry in the weight matrix is updated using its own partial derivative of the loss. 
+\end{rem}
+
+
+\subsection{3-layer Neural network}
+
+\begin{itemize}
+    \item \textbf{Inputs/Activations:}
+    \begin{itemize}
+        \item $a^{(0)} = x \in \mathbb{R}^{D_0}$
+        \item $a^{(1)} \in \mathbb{R}^{D_1}$, $a^{(2)} \in \mathbb{R}^{D_2}$, $a^{(3)} \in \mathbb{R}^{D_3}$
+    \end{itemize}
+    \item \textbf{Pre-activations:}
+    \begin{itemize}
+        \item $z^{(1)} \in \mathbb{R}^{D_1}$, $z^{(2)} \in \mathbb{R}^{D_2}$, $z^{(3)} \in \mathbb{R}^{D_3}$
+    \end{itemize}
+    \item \textbf{Parameters:}
+    \begin{itemize}
+        \item $W^{(1)} \in \mathbb{R}^{D_1\times D_0}$, $\; b^{(1)}\in\mathbb{R}^{D_1}$
+        \item $W^{(2)} \in \mathbb{R}^{D_2\times D_1}$, $\; b^{(2)}\in\mathbb{R}^{D_2}$
+        \item $W^{(3)} \in \mathbb{R}^{D_3\times D_2}$, $\; b^{(3)}\in\mathbb{R}^{D_3}$
+    \end{itemize}
+    \item \textbf{Nonlinearities per layer:} $\sigma_1, \sigma_2, \sigma_3$ (e.g., ReLU/tanh/softmax head, etc.)
+    \item \textbf{Loss:} $\mathcal{L}(a^{(3)}, t)$ for target $t$
+\end{itemize}
+
+
+\subsubsection{Error signal}
+
+\begin{defn}
+    The error signal tells how much the loss changes when the input to neuron $\ell$ changes. It is passed backward. 
+
+   $$\frac{\partial L}{\partial z_j^{(\ell)}} = \frac{\partial L}{\partial a_j^{(\ell)}} \cdot \frac{\partial a_j^{(\ell)}}{\partial z_j^{(\ell)}}
+$$
+\end{defn}
+
+\subsubsection{Multivariate chain rule}
+
+We update weights and bias: 
+
+\begin{enumerate}
+    \item Weight gradient: For a weight connecting neuron $j$ in layer $\ell - 1$ to neuron $k$ in layer $\ell$: 
+    $$\frac{\partial L}{\partial w_{jk}^{(\ell)}} = \frac{\partial L}{\partial z_k^{(\ell)}} \cdot \frac{\partial z_k^{(\ell)}}{\partial w_{jk}^{(\ell)}} = \delta_k^{(\ell)} \cdot a_j^{(\ell-1)}
+$$
+\item Bias gradient: 
+$$\frac{\partial L}{\partial b_k^{(\ell)}} = \frac{\partial z_k^{(\ell)}}{\partial L} \cdot \frac{\partial b_k^{(\ell)}}{\partial z_k^{(\ell)}} = \delta_k^{(\ell)} \cdot 1 = \delta_k^{(\ell)}
+$$
+\end{enumerate}
+
+\subsubsection{Gradient descent}
+
+\begin{enumerate}
+    \item Weight update
+    \[
+w_{jk}^{(\ell)} \gets w_{jk}^{(\ell)} - \eta \frac{\partial L}{\partial w_{jk}^{(\ell)}}
+\]
+
+    \item Bias update
+    \[
+b_k^{(\ell)} \gets b_k^{(\ell)} - \eta \frac{\partial L}{\partial b_k^{(\ell)}}
+\]
+\end{enumerate}
+
+\subsection{Backpropagation Algorithm}
+
+\begin{itemize}
+    \item Forward pass: \[
+a^{(0)} \;\to\; z^{(1)} \;\to\; a^{(1)} \;\to\; \cdots \;\to\; z^{(N)} \;\to\; a^{(N)} \;\to\; L
+\]
+
+\item Backward pass: \[
+\frac{\partial L}{\partial a^{(N)}} 
+\;\to\;
+\frac{\partial L}{\partial z^{(N)}} 
+\;\to\;
+\frac{\partial L}{\partial a^{(N-1)}} 
+\;\to\;
+\frac{\partial L}{\partial z^{(N-1)}} 
+\;\to\;
+\cdots
+\;\to\;
+\frac{\partial L}{\partial W}
+\]
+
+\item How do gradients propagate \textbf{recursively}? 
+\[
+\delta^{(N)} \;\to\; \delta^{(N-1)} \;\to\; \delta^{(N-2)} \;\to\; \cdots \;\to\; \delta^{(1)}
+\]
+
+\begin{note}
+    Each layer’s gradient depends on the gradient from the next layer, so we compute them one at a time, backwards. We answer this question: "How much the error contributed in each layer?"
+\end{note}
+
+
+\end{itemize}
+
+\subsubsection{Forward Pass}
+Compute and store intermediate values (activations \(a^{(m)}\) and pre-activations \(z^{(m)}\)).
+
+\[
+z^{(m)} = W^{(m)} a^{(m-1)} + b^{(m)}, \quad a^{(m)} = \sigma(z^{(m)})
+\]
+
+At the output, we obtain loss function:
+\[
+L = L(a^{(N)}, t)
+\]
+
+\subsubsection{Backward Pass}
+
+Use those stored values to efficiently compute gradients for all weights.
+
+Back-propagaion passes gradients through 3 objects: 
+
+\begin{itemize}
+    \item Output layer: \[
+\frac{\partial \mathcal{L}}{\partial z^{(N)}} = \frac{\partial \mathcal{L}}{\partial a^{(N)}} \odot \sigma'(z^{(N)})
+\]
+\item  For each hidden layer m = 1, ..., N:
+
+\[
+\frac{\partial \mathcal{L}}{\partial z^{(m)}} = \frac{\partial \mathcal{L}}{\partial a^{(m)}} \odot \sigma'(z^{(m)})  = \left( W^{(m+1)} \right)^T \frac{\partial \mathcal{L}}{\partial z^{(m+1)}} \odot \sigma'(z^{(m)})
+\]
+\item (Parameters) Weight and bias gradient for the m-th layer
+\[
+\frac{\partial \mathcal{L}}{\partial W^{(m)}} = \frac{\partial \mathcal{L}}{\partial z^{(m)}} \left( a^{(m-1)} \right)^T
+\]
+\end{itemize}
+
+\begin{note}
+    We need both backward and forward pass to compute back propagation as the forward pass compute and store intermediate values needed for backward pass. Idea: compute all derivatives in one pass by reusing intermediate results
+(dynamic programming).
+\end{note}
+
+\begin{note}
+    A layer has $L \longrightarrow a \longrightarrow z \longrightarrow (W,b)$
+\end{note}
+
+
+\section{Vectorizing the forward pass for a batch of data points}
+
+\subsection{From single to batch}
+
+\begin{enumerate}
+    \item Single data point: $a^{(0)} \in \mathbb{R}^{D^{(0)} \times 1}, \quad z^{(1)} \in \mathbb{R}^{D^{(1)} \times 1}$, $\quad \mathcal{L} = - \mathbf{t}^\top \log \mathbf{a}^{(2)} \implies$
+    \item Batch of $N$ examples: 
+   $ A^{(0)} \in \mathbb{R}^{N \times D^{(0)}}, \quad
+Z^{(1)} \in \mathbb{R}^{N \times D^{(1)}}$, $\quad A^{(1)} = \text{ReLU}(Z^{(1)})$, $\quad Z^{(2)} = A^{(1)}(W^{(2)})^\top + \mathbf{1}_N (\mathbf{b}^{(2)})^\top$, $\quad A^{(2)} = \frac{\exp(Z^{(2)})}{\exp(Z^{(2)}) \mathbf{1}_{D^{(2)}}}$, $\quad \mathcal{L} = - \frac{1}{N} \mathbf{1}_N^\top \big( T \odot \log A^{(2)} \big) \mathbf{1}_{D}$
+\end{enumerate}
+
+\subsection{Functions in layers}
+
+\begin{enumerate}
+    \item Pre-activation: $$Z^{(1)} = A^{(0)}(W^{(1)})^\top + \mathbf{1}_N (\mathbf{b}^{(1)})^\top$$
+    \begin{itemize}
+    \item Weight matrix from layer 0 to layer 1: $W^{(1)}) \in \mathbb{R}^{D^{(1)}} \times D^{(0)}$
+        \item Duplicate bias vectors in $N$ rows: $$\mathbf{1}_N (\mathbf{b}^{(1)})^\top \in \mathbb{R}^{N \times D^{(1)}} = \begin{pmatrix}
+1 \\
+1 \\
+\vdots \\
+1
+\end{pmatrix}
+\begin{pmatrix}
+b^{(1)}_1 & b^{(1)}_2 & \cdots & b^{(1)}_{D^{(1)}}
+\end{pmatrix}
+= \begin{pmatrix}
+b^{(1)}_1 & b^{(1)}_2 & \cdots & b^{(1)}_{D^{(1)}} \\
+b^{(1)}_1 & b^{(1)}_2 & \cdots & b^{(1)}_{D^{(1)}} \\
+\vdots & \vdots & \ddots & \vdots \\
+b^{(1)}_1 & b^{(1)}_2 & \cdots & b^{(1)}_{D^{(1)}}
+\end{pmatrix}_{N \times D^{(1)}}$$
+    \end{itemize}
+    
+\item ReLU activation function: 
+$$A^{(1)} = \text{ReLU}(Z^{(1)}) = 
+\begin{pmatrix}
+\max(0, z_{11}^{(1)}) & \cdots & \max(0, z_{1 D^{(1)}}^{(1)}) \\
+\max(0, z_{21}^{(1)}) & \cdots & \max(0, z_{2 D^{(1)}}^{(1)}) \\
+\vdots & \ddots & \vdots \\
+\max(0, z_{N1}^{(1)}) & \cdots & \max(0, z_{N D^{(1)}}^{(1)})
+\end{pmatrix}$$
+
+\item Softmax: $$A^{(2)} = \frac{\exp(Z^{(2)})}{\exp(Z^{(2)}) \mathbf{1}_{D^{(2)}}}$$
+\item Cross Entropy Loss: 
+$$ \mathcal{L}(T, A) = - \frac{1}{N} \mathbf{1}_N^\top \big( T \odot \log A^{(2)} \big) \mathbf{1}_{D^{(2)}}$$
+\begin{itemize}
+    \item Label matrix: $T =
+\begin{pmatrix}
+t_{11} & \cdots & t_{1D} \\
+t_{21} & \cdots & t_{2D} \\
+\vdots & \ddots & \vdots \\
+t_{N1} & \cdots & t_{ND}
+\end{pmatrix}$
+\item Output matrix: $A^{(2)} =
+\begin{pmatrix}
+a_{11} & \cdots & a_{1D} \\
+a_{21} & \cdots & a_{2D} \\
+\vdots & \ddots & \vdots \\
+a_{N1} & \cdots & a_{ND}
+\end{pmatrix}$
+\item Hadamard product (element-wise multiplication): multiply each correct-class log-prob by 1 and all others by 0
+$$T \odot \log A^{(2)} =
+\begin{pmatrix}
+t_{11}\log a_{11} & \cdots & t_{1D}\log a_{1D} \\
+t_{21}\log a_{21} & \cdots & t_{2D}\log a_{2D} \\
+\vdots & \ddots & \vdots \\
+t_{N1}\log a_{N1} & \cdots & t_{ND}\log a_{ND}
+\end{pmatrix}$$
+\item Multiply by $1_{D^{(2)}}$: sum across classes for each data $\begin{pmatrix}
+\sum_{k=1}^D t_{1k}\log a_{1k} \\
+\sum_{k=1}^D t_{2k}\log a_{2k} \\
+\vdots \\
+\sum_{k=1}^D t_{Nk}\log a_{Nk}
+\end{pmatrix}$
+\item Multiply by $1^{\top}_{N}$: sum across samples
+$\sum_{n=1}^{N} \sum_{k=1}^{D} t_{nk} \log a_{nk}$
+\item Divide by $N$: average loss over batch
+\end{itemize}
+
+\end{enumerate}
+
+\subsection{All-ones vector}
+
+\begin{enumerate}
+    \item Summation across rows = transpose of all-ones vector with column vector: 
+    $$\mathbf{1}_{D^{(2)}}^\top \exp(\mathbf{z}^{(2)}) = \sum_{k=1}^{D^{(2)}} e^{z_k^{(2)}} = \mathbf{1}_{D^{(2)}}^\top \exp(\mathbf{z}^{(2)}) = \begin{pmatrix} 1 & 1 & \cdots & 1 \end{pmatrix} \begin{pmatrix} e^{z_1^{(2)}} \\ e^{z_2^{(2)}} \\ \vdots \\ e^{z_{D^{(2)}}^{(2)}} \end{pmatrix} = e^{z_1^{(2)}} + e^{z_2^{(2)}} + \cdots + e^{z_{D^{(2)}}^{(2)}}$$
+    \item Summation across columns = column vector with all-ones column vector
+    $$\exp(Z^{(2)}) \cdot \mathbf{1}_{D^{(2)}} = 
+\begin{pmatrix}
+e^{z_{11}^{(2)}} & e^{z_{12}^{(2)}} & \cdots & e^{z_{1 D^{(2)}}^{(2)}} \\
+e^{z_{21}^{(2)}} & e^{z_{22}^{(2)}} & \cdots & e^{z_{2 D^{(2)}}^{(2)}} \\
+\vdots & \vdots & \ddots & \vdots \\
+e^{z_{N1}^{(2)}} & e^{z_{N2}^{(2)}} & \cdots & e^{z_{N D^{(2)}}^{(2)}} \\
+\end{pmatrix}
+\begin{pmatrix}
+1 \\
+1 \\
+\vdots \\
+1
+\end{pmatrix} = \begin{pmatrix}
+e^{z_{11}^{(2)}} + e^{z_{12}^{(2)}} + \cdots + e^{z_{1 D^{(2)}}^{(2)}} \\
+e^{z_{21}^{(2)}} + e^{z_{22}^{(2)}} + \cdots + e^{z_{2 D^{(2)}}^{(2)}} \\
+\vdots \\
+e^{z_{N1}^{(2)}} + e^{z_{N2}^{(2)}} + \cdots + e^{z_{N D^{(2)}}^{(2)}}
+\end{pmatrix} \in \mathbb{R}^{N \times 1}$$
+\end{enumerate}
+
+\section{Vectorizing the backward pass equations}
+
+\subsection{Setup}
+
+\begin{enumerate}
+    \item Weight matrix: 
+   $ W = \begin{pmatrix}
+\text{row for neuron } 1 \\
+\text{row for neuron } 2 \\
+\text{row for neuron } 3 \\
+\text{row for neuron } 4 \\
+\text{row for neuron } 5
+\end{pmatrix}$
+\begin{itemize}
+    \item Number of rows = number of constructed neurons in next layers
+    \item A column contains all the weights coming from one neuron in curren layer
+\end{itemize}
+
+
+\end{enumerate}
+
+
+\subsection{Single data point}
+
+\begin{enumerate}
+    \item Error signal:
+$$\nabla_{\mathbf{z}^{(2)}}\mathcal{L} = \begin{pmatrix}
+\frac{\partial \mathcal{L}}{\partial z_1} \\
+\frac{\partial \mathcal{L}}{\partial z_2} \\
+\frac{\partial \mathcal{L}}{\partial z_3} \\
+\vdots \\
+\frac{\partial \mathcal{L}}{\partial z_D}
+\end{pmatrix} = \begin{pmatrix}
+a_1 - t_1 \\
+a_2 - t_2 \\
+\vdots \\
+a_D - t_D
+\end{pmatrix}
+= \mathbf{a^{(2)}} - \mathbf{t}$$
+
+\item Gradient of Loss w.r.t. weights: 
+$$\nabla_{W^{(2)}}\mathcal{L} = \begin{pmatrix}
+\frac{\partial \mathcal{L}}{\partial z_1^{(2)}} \\
+\frac{\partial \mathcal{L}}{\partial z_2^{(2)}} \\
+\vdots \\
+\frac{\partial \mathcal{L}}{\partial z_{D^{(2)}}^{(2)}}
+\end{pmatrix}
+\begin{pmatrix}
+a_1^{(1)} & a_2^{(1)} & \cdots & a_{D^{(1)}}^{(1)}
+\end{pmatrix} = (\nabla_{z^{(2)}}\mathcal{L}) (a^{(1)})^{\top}$$
+
+$$\nabla_{W^{(1)}} L
+=
+\left(\nabla_{z^{(1)}} L\right)
+\left(a^{(0)}\right)^\top$$
+
+\begin{itemize}
+    \item Each output neuron at layer $m$ sends back an error signal to all incoming weights at layer $m-1$
+\end{itemize}
+
+\item Gradient of Loss w.r.t biases: 
+
+$$\nabla_{\mathbf{b}^{(2)}}\mathcal{L} =
+\begin{pmatrix}
+\frac{\partial \mathcal{L}}{\partial b_1^{(2)}} \\
+\frac{\partial \mathcal{L}}{\partial b_2^{(2)}} \\
+\vdots \\
+\frac{\partial \mathcal{L}}{\partial b_{D^{(2)}}^{(2)}}
+\end{pmatrix}
+=
+\begin{pmatrix}
+\frac{\partial \mathcal{L}}{\partial z_1^{(2)}} \\
+\frac{\partial \mathcal{L}}{\partial z_2^{(2)}} \\
+\vdots \\
+\frac{\partial \mathcal{L}}{\partial z_{D^{(2)}}^{(2)}}
+\end{pmatrix}
+= \nabla_{\mathbf{z}^{(2)}}\mathcal{L}$$
+
+$$\nabla_{\mathbf{b}^{(1)}}\mathcal{L} = \nabla_{\mathbf{z}^{(1)}}\mathcal{L}$$
+
+
+\begin{itemize}
+    \item Partial derivatives: $\frac{\partial \mathcal{L}}{\partial b_j^{(2)}} = \sum_{k=1}^{D^{(2)}} \frac{\partial \mathcal{L}}{\partial z_k^{(2)}} \frac{\partial z_k^{(2)}}{\partial b_j^{(2)}} = \sum_{k=1}^{D^{(2)}} (\nabla_{\mathbf{z}^{(2)}}\mathcal{L})_k \, \delta_{kj} = (\nabla_{\mathbf{z}^{(2)}}\mathcal{L})_j$
+\end{itemize}
+
+\item Gradient w.r.t. (hidden) activations: 
+$$\nabla_{A^{(1)}}\mathcal{L} = (W^{(2)})^\top (\nabla_{Z^{(2)}}\mathcal{L})$$
+
+\begin{itemize}
+    \item Partial derivatives: $\frac{\partial \mathcal{L}}{\partial a_j^{(1)}} = \sum_{k=1}^{D^{(2)}} \frac{\partial \mathcal{L}}{\partial z^{(2)}_k} \frac{\partial z^{(2)}_k}{\partial a_j^{(1)}} = \sum_{k=1}^{D^{(2)}} (\nabla_{\mathbf{z}^{(2)}}\mathcal{L})_k W_{kj}^{(2)}$
+    \item Loss change if hidden activations $a^{(1)}$ change, if the output logits $z^{(2)}$ scaled by weights in $\mathbb{W}^{(2)}$ change
+\end{itemize}
+
+\item Back-distributed error: 
+$$\nabla_{\mathbf{z}^{(1)}}\mathcal{L} = (\nabla_{\mathbf{a}^{(1)}}\mathcal{L}) \odot \text{ReLU}'(Z^{(1)})$$
+
+\begin{itemize}
+    \item Partial derivatives: $\frac{\partial \mathcal{L}}{\partial z_j^{(1)}} = \frac{\partial \mathcal{L}}{\partial a_j^{(1)}} \frac{\partial a_j^{(1)}}{\partial z_j^{(1)}} = \frac{\partial \mathcal{L}}{\partial a_j^{(1)}} \cdot \text{ReLU'}(z_j^{(1)})$
+\end{itemize}
+\end{enumerate}
+
+\begin{note}
+$\nabla_{\mathbf{z}^{(2)}}\mathcal{L}$ is different from $\nabla_{\mathbf{z}^{(1)}}\mathcal{L}$: 
+\begin{itemize}
+    \item $\nabla_{\mathbf{z}^{(2)}}\mathcal{L}$: How wrongs are the predictions? 
+    \item $\nabla_{\mathbf{z}^{(1)}}\mathcal{L}$: How much did each hidden neuron cause the mistake, and was it even active?
+\end{itemize}
+\end{note}
+
+
+\subsection{Batch}
+
+
+\begin{table}[h!]
+\centering
+\caption{Backpropagation Gradients (Softmax + Cross-Entropy)}
+\label{tab:backprop_summary}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Single Example (Vectors)} & \textbf{Batch Form (Matrices)} & \textbf{Shape of Batch Gradient} \\
+\hline
+\(\nabla_{\mathbf{z}^{(2)}}\mathcal{L} = \mathbf{a}^{(2)} - \mathbf{t}\) & \(\nabla_{Z^{(2)}}\mathcal{L} = \frac{1}{N}(\mathbf{A}^{(2)} - \mathbf{T})\) & \(N \times D^{(2)}\) \\
+\hline
+\(\nabla_{W^{(2)}}\mathcal{L} = (\nabla_{\mathbf{z}^{(2)}}\mathcal{L}) (\mathbf{a}^{(1)})^\top\) & \(\nabla_{W^{(2)}}\mathcal{L} = (\mathbf{A}^{(1)})^\top \nabla_{Z^{(2)}}\mathcal{L}\) & \(D^{(1)} \times D^{(2)}\) \\
+\hline
+\(\nabla_{\mathbf{b}^{(2)}}\mathcal{L} = \nabla_{\mathbf{z}^{(2)}}\mathcal{L}\) & \(\nabla_{\mathbf{b}^{(2)}}\mathcal{L} = \frac{1}{N} (\nabla_{Z^{(2)}}\mathcal{L})^\top \mathbf{1}_N\) & \(D^{(2)} \times 1\) \\
+\hline
+\(\nabla_{\mathbf{a}^{(1)}}\mathcal{L} = (W^{(2)})^\top \nabla_{\mathbf{z}^{(2)}}\mathcal{L}\) & \(\nabla_{A^{(1)}}\mathcal{L} = \nabla_{Z^{(2)}}\mathcal{L} W^{(2)}\) & \(N \times D^{(1)}\) \\
+\hline
+\(\nabla_{\mathbf{z}^{(1)}}\mathcal{L} = \nabla_{\mathbf{a}^{(1)}}\mathcal{L} \odot \text{ReLU}'(\mathbf{z}^{(1)})\) & \(\nabla_{Z^{(1)}}\mathcal{L} = \nabla_{A^{(1)}}\mathcal{L} \odot \text{ReLU}'(Z^{(1)})\) & \(N \times D^{(1)}\) \\
+\hline
+\(\nabla_{W^{(1)}}\mathcal{L} = (\nabla_{\mathbf{z}^{(1)}}\mathcal{L}) (\mathbf{a}^{(0)})^\top\) & \(\nabla_{W^{(1)}}\mathcal{L} = (\mathbf{A}^{(0)})^\top \nabla_{Z^{(1)}}\mathcal{L}\) & \(D^{(0)} \times D^{(1)}\) \\
+\hline
+\(\nabla_{\mathbf{b}^{(1)}}\mathcal{L} = \nabla_{\mathbf{z}^{(1)}}\mathcal{L}\) & \(\nabla_{\mathbf{b}^{(1)}}\mathcal{L} = \frac{1}{N} (\nabla_{Z^{(1)}}\mathcal{L})^\top \mathbf{1}_N\) & \(D^{(1)} \times 1\) \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{enumerate}
+    \item Bias: 
+    \begin{itemize}
+        \item  Each class has its own bias.
+        \item Each bias sums error from all samples that passed through it.
+    \end{itemize}
+    \item Weights: Update weights through input from layer $m-1$
+    \item (Hidden) Activation output: since the output from $M$ affects loss through next by being input for next layer $m+1$
+\end{enumerate}
+
+
+
+
+\section{Vector/Matrix products}
+\subsection{Row Vector × Column Vector = Scalar}
+\subsection{Column vector x Row vector = Matrix}
+
+\textbf{Outer product} → used to compute weight gradients $\nabla_{\mathbf{W}^{(2)}} \mathcal{L}$ in backprop.
+
+\subsection{Matrix × Column Vector = Column Vector}

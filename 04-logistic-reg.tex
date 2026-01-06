@@ -1,0 +1,88 @@
+\part{Logistic Regression}
+
+\section{Feature Mapping}
+
+\begin{problem}
+    How to tackle non-linear relationship of input and output? 
+\end{problem}
+
+
+Solution: Turn non-linear relationship in original features into linear one in transformed features.
+\[
+\mathbf{x} \in \mathbb{R}^D \quad \mapsto \quad \psi(\mathbf{x}) \in \mathbb{R}^{D'}.
+\]
+
+\section{Regularization (Controlling Model Complexity)} 
+
+\begin{problem}
+Large weights → sensitive predictions → overfitting
+\end{problem}
+
+\begin{eq}[The $L^2$ Regularizer]
+Regularizer as a penalty term (constraint) is added to the model). Goal is to penalize large weights.
+\[
+R(\mathbf{w}) = \frac{1}{2} \sum_i w_i^2
+\]
+
+\end{eq}
+
+\subsection{The $L^2$ Cost function}
+
+\begin{rem}
+    Cost function: Quantifies how badly a hypothesis fits the data.
+\end{rem}
+
+\begin{eq}
+
+
+    \[
+\mathcal{E}_{\text{reg}}(\mathbf{w}) = \mathcal{E}(\mathbf{w}) + \lambda R(\mathbf{w}) 
+= \mathcal{E}(\mathbf{w}) + \frac{\lambda}{2} \sum_i w_i^2
+\]
+
+Combine 2 objectives: 
+\begin{enumerate}
+    \item Fit the data (minimize $\mathcal{E}(\mathbf{w})$). 
+    \item Keep the model simple (minimize $R(\mathbf{w})$). 
+\end{enumerate}
+
+Hyperparameter $\lambda$: 
+\begin{itemize}
+    \item Large $\lambda$ $\rightarrow$ simpler model $\rightarrow$ underfitting
+    \item Small $\lambda$ $\rightarrow$ complex model $\rightarrow$ overfitting
+\end{itemize}
+\end{eq}
+
+
+\section{Logistic Regression}
+
+\begin{itemize}
+    \item \textbf{Linear model:} compute raw score
+    \[
+        z = \mathbf{w}^T \mathbf{x}.
+    \]
+
+    \item \textbf{Activation function (sigmoid):} Convert $z \in (-\infty, \infty)$ into probability $y \in (0,1)$
+    \[
+        y = \sigma(z) = \frac{1}{1+e^{-z}}.
+    \]
+
+    \begin{enumerate}
+        \item The model is equally uncertain when: $y \geq 0.5$ or $y < 0.5$. 
+        \item $y$ estimates $P(\text{class}|x)$. 
+        \item Based on activation function, y=0.5 when z=0. 
+        
+    \end{enumerate}
+
+    \item \textbf{Loss (cross-entropy):} measure mismatch between predicted probability and true label
+    \[
+        L(y,t) = -\big[t \log(y) + (1-t)\log(1-y)\big].
+    \]
+
+    \item \textbf{Optimization (gradient descent variants):} update weights to minimize loss and improve predictions
+    \[
+        \mathbf{w} \leftarrow \mathbf{w} - \alpha \nabla L.
+    \]
+\end{itemize}
+
+

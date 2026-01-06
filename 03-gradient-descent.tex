@@ -1,0 +1,40 @@
+\part{Gradient Descent}
+
+\begin{problem}
+    Direct solutions might be expensive to solve for $w$. GD updates are cheaper and scale better to high-dimensional data.
+\end{problem}
+
+
+\begin{eq}[Gradient descent]
+GD is used to \textbf{minimize a function (loss/cost)} by updating parameters step by step. 
+
+Start from a random guess $w_0$. Repeatedly update weights using:
+\[
+w \leftarrow w - \alpha \nabla_w F(w),
+\]
+where:
+\begin{itemize}
+    \item $F(x)$ is the objective function. 
+    \item $\alpha$ is learning rate to choose step size (hyperparameter). 
+    \item \textbf{Direction:} Move opposite the gradient (since the gradient points uphill).
+    \item \textbf{Magnitude:} Proportional to the gradient size.
+\end{itemize}
+
+\end{eq}
+
+\section{$F(x)$ in Gradient descent}
+
+\subsection{GD in Linear regression}
+
+(Mean squared error)
+\[
+F(w) = \frac{1}{N} \sum_{i=1}^{N} \big( w^{T} x_i - t_i \big)^2
+\]
+
+\subsection{GD in Logistic Regression}
+
+(Cross-entropy loss)
+\[
+F(w) = -\frac{1}{N} \sum_{i=1}^{N} \Big[ t_i \log(y_i) + (1 - t_i) \log(1 - y_i) \Big]
+\]
+

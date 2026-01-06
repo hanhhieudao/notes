@@ -1,0 +1,150 @@
+\documentclass[a4paper]{article}
+
+\usepackage[a4paper, left=2cm, right=2cm, top=2cm, bottom=2cm]{geometry}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[hidelinks]{hyperref}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{tikz-cd}
+\usepackage{mathrsfs}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{ dsfont }
+\usepackage[table]{xcolor} 
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{caption} 
+\usepackage{array}  
+\usepackage{tabularx}
+\setlist{noitemsep, topsep=0pt, partopsep=0pt, parsep=0pt, itemsep=0pt}
+\usepackage{titlesec}
+\newcommand{\partbreak}{\clearpage} % force page break before part
+\let\oldpart\part
+\renewcommand{\part}[1]{\clearpage\oldpart{#1}}
+
+
+
+\theoremstyle{definition}
+
+\newtheorem*{defn}{Def}
+\newtheorem*{ex}{Example}
+\newtheorem*{exr}{Exercise}
+\newtheorem*{thm}{Theorem}
+\newtheorem*{prop}{Proposition}
+\newtheorem*{lem}{Lemma}
+\newtheorem*{cor}{Corollary}
+\newtheorem*{note}{Note}
+
+%---Define new theorem style---
+\newtheoremstyle{coloredProb}% name
+  {}% Space above
+  {}% Space below
+  {}% Body font
+  {}% Indent amount
+  {\color{orange}\bfseries}% Theorem head font (title)
+  {.}% Punctuation after theorem head
+  { }% Space after theorem head
+  {}% Theorem head spec
+
+% Use the new style
+\theoremstyle{coloredProb}
+\newtheorem*{problem}{Problem}
+
+\newtheoremstyle{coloredRemark}% name
+  {}% Space above
+  {}% Space below
+  {}% Body font
+  {}% Indent amount
+  {\color{blue}\bfseries}% Theorem head font (title)
+  {.}% Punctuation after theorem head
+  { }% Space after theorem head
+  {}% Theorem head spec
+
+% Use the new style
+\theoremstyle{coloredRemark}
+\newtheorem*{rem}{Remark}
+
+
+\newtcolorbox{eq}[1][]{
+    colback=green!10,    % light green background
+    colframe=green!50!black, % border color
+    fonttitle=\bfseries,
+    title=#1,
+    boxrule=0.5pt,
+    arc=4pt,
+    left=2mm,
+    right=2mm,
+    top=1mm,
+    bottom=1mm
+}
+
+
+
+\newtcolorbox{important}[1][]{
+    colback=olive!10, colframe=olive!50!black, fonttitle=\bfseries,
+    title=#1,
+    boxrule=0.5pt,
+    arc=4pt,
+    left=2mm,
+    right=2mm,
+    top=1mm,
+    bottom=1mm
+}
+
+%-----HIGHLIGHTERS---------
+\newcommand{\pink}[1]{\colorbox{pink!50}{#1}}
+
+
+
+
+
+%-----Front----------------
+
+\title{CSC311: Intro. to Machine Learning}
+
+\author{Hanh H. Dao}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+
+\input{01-knn}
+
+\input{01-k-fold-cross-validation}
+\input{02-decision-tree}
+
+\input{03-linear-model}
+
+\input{03-linear-regression}
+
+\input{03-gradient-descent} 
+
+\input{04-logistic-reg}
+
+\input{04-softmax-regression}
+
+
+\input{05-neural-networks}
+
+\input{06-backpropagation}
+
+\input{07-bias-variance-bagging}
+\input{08-naive-bayes-model}
+\input{09-gaussian-discriminant-analysis}
+\input{10-clustering}
+
+\newpage
+\input{miscellaneous-notes}
+
+
+\end{document}
